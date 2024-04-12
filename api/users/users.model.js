@@ -6,7 +6,7 @@ const userSchema = Schema({
   name: String,
   password: {
     type: String,
-    required: [true, "Password is required"],
+    required: [true, "Mot de passe requis"],
     minlength: 8,
   },
   email: {

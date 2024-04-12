@@ -29,6 +29,11 @@ class UserService {
     }
     return user._id;
   }
+  async createWithUserId(data, userId) {
+    const user = new User(data);
+    user._id = userId;
+    return user.save();
+  }
 }
 
 module.exports = new UserService();

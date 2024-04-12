@@ -1,4 +1,4 @@
-const Article = require('./article.schema');
+const Article = require('./articles.schema');
 
 async function createArticle(data, user) {
     const article = new Article({
@@ -17,12 +17,16 @@ async function createArticle(data, user) {
     return article;
 }
 
+async function getUserArticles(userId) {
+    return Article.find({ userId }, "-password").populate("userId");
+  }
+
 async function updateArticle(id, data, user) {
-    if (user.role !== 'admin') throw new Error('Unauthorized');
+    if (user.role !== 'admin') throw new Error('Accès refusé!');
 
     const article = await Article.findById(id);
 
-    if (!article) throw new Error('Article not found');
+    if (!article) throw new Error('Aucun article trouvé  ');
 
     article.title = data.title;
     article.author = user._id;
@@ -40,14 +44,14 @@ async function updateArticle(id, data, user) {
 }
 
 async function deleteArticle(id, user) {
-    if (user.role !== 'admin') throw new Error('Unauthorized');
+    if (user.role !== 'admin') throw new Error('Accès refusé');
 
     const article = await Article.findById(id);
 
-    if (!article) throw new Error('Article not found');
+    if (!article) throw new Error('Aucun article trouvé ');
 
     await article.remove();
-    socket.send({ _id: id, action: 'delete' });
+    socket.send({ _id: id, action: 'suppression' });
 
     return article;
 }

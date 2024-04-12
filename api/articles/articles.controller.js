@@ -1,34 +1,46 @@
-const ArticleService = require('./articles.service');
+const io = require('socket.io');
+const ArticlesService = require('./articles.service');
 
-async function createArticle(req, res) {
-    try {
-        const article = await ArticleService.createArticle(req.body, req.user);
-        res.status(201).json(article);
-    } catch (err) {
-        res.status(400).json(err.message);
+class ArticlesController {
+    constructor(articlesService, io) {
+        this.articlesService = articlesService;
+        this.io = io;
+    }
+
+    async createArticle(req, res) {
+        try {
+            const article = await this.articlesService.createArticle(req.body, req.user);
+            this.io.emit("article_created", article);
+            res.status(201).json(article);
+        } catch (error) {
+            res.status(400).json(error.message);
+        }
+    }
+
+
+    async updateArticle(req, res) {
+        try {
+            const article = await this.articlesService.updateArticle(req.params.id, req.body, req.user);
+            this.io.emit("article_updated", article);
+            res.status(200).json(article);
+        } catch (error) {
+            res.status(400).json(error.message);
+        }
+    }
+
+    async deleteArticle(req, res) {
+        try {
+            const article = await this.articlesService.deleteArticle(req.params.id, req.user);
+            this.io.emit("article_deleted", article);
+            res.status(200).json(article);
+        } catch (error) {
+            res.status(400).json(error.message);
+        }
     }
 }
-
-async function updateArticle(req, res) {
-    try {
-        const article = await ArticleService.updateArticle(req.params.id, req.body, req.user);
-        res.status(200).json(article);
-    } catch (err) {
-        res.status(400).json(err.message);
-    }
-}
-
-async function deleteArticle(req, res) {
-    try {
-        const article = await ArticleService.deleteArticle(req.params.id, req.user);
-        res.status(200).json(article);
-    } catch (err) {
-        res.status(400).json(err.message);
-    }
-}
+const articlesController = new ArticlesController(ArticlesService, io);
 
 module.exports = {
-    createArticle,
-    updateArticle,
-    deleteArticle,
+    ArticlesController,
 };
+

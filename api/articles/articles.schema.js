@@ -15,7 +15,7 @@ const articleSchema = Schema({
   status: {
     type: String,
     enum: ['draft', 'published'],
-    default: 'draft' // on peut définir une valeur par défaut si nécessaire
+    default: 'draft' 
   },
   user: {
     type: Schema.Types.ObjectId,

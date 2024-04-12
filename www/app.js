@@ -1,9 +1,11 @@
 const { server } = require("../server");
 const config = require("../config");
 const mongoose = require("mongoose");
+mongoose.set('strictQuery', true);
+
+
 
 mongoose.connect(config.mongoUri);
-
 const db = mongoose.connection;
 
 db.on("erreur", (err) => {
@@ -15,5 +17,5 @@ db.on("open", () => {
 });
 
 server.listen(config.port, () => {
-  console.log("app running");
+  console.log("Application lancée");
 });

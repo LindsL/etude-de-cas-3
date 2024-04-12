@@ -1,9 +1,13 @@
 const express = require('express');
+const articlesService = require('../articles/articles.service');
+const { ArticlesController } = require('./articles.controller');
 const router = express.Router();
-const ArticlesController = require('./articles.controller');
 
-router.post('/', ArticlesController.createArticle);
-router.put('/:id', ArticlesController.updateArticle);
-router.delete('/:id', ArticlesController.deleteArticle);
+const articlesController = new ArticlesController(articlesService);
+
+router.post('/', articlesController.createArticle);
+router.put('/:id', articlesController.updateArticle);
+router.delete('/:id', articlesController.deleteArticle);
 
 module.exports = router;
+

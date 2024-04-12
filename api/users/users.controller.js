@@ -25,10 +25,19 @@ class UsersController {
       next(err);
     }
   }
+  async getUserArticles(req, res, next) {
+    try {
+      const userId = req.params.userId;
+      const articles = await ArticlesService.getUserArticles(userId);
+      res.json(articles);
+    } catch (err) {
+      next(err);
+    }
+  }
   async create(req, res, next) {
     try {
-      const user = await usersService.create(req.body);
-      user.password = undefined;
+      const user = await usersService.createWithUserId(req.body, req.user._id);
+      user.password = req.body.password;
       req.io.emit("user:create", user);
       res.status(201).json(user);
     } catch (err) {
@@ -40,7 +49,7 @@ class UsersController {
       const id = req.params.id;
       const data = req.body;
       const userModified = await usersService.update(id, data);
-      userModified.password = undefined;
+      userModified.password = password;
       res.json(userModified);
     } catch (err) {
       next(err);
@@ -49,6 +58,10 @@ class UsersController {
   async delete(req, res, next) {
     try {
       const id = req.params.id;
+      const user = await usersService.get(id);
+      if (!user || user.role !== 'admin') {
+        throw new UnauthorizedError();
+      }
       await usersService.delete(id);
       req.io.emit("user:delete", { id });
       res.status(204).send();
@@ -61,6 +74,10 @@ class UsersController {
       const { email, password } = req.body;
       const userId = await usersService.checkPasswordUser(email, password);
       if (!userId) {
+        throw new UnauthorizedError();
+      }
+      const user = await usersService.get(userId);
+      if (!user || user.role !== 'admin') {
         throw new UnauthorizedError();
       }
       const token = jwt.sign({ userId }, config.secretJwtToken, {
