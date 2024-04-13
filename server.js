@@ -7,18 +7,17 @@ const userRouter = require("./api/users/users.router");
 const articlesRouter = require("./api/articles/articles.router")
 const usersController = require("./api/users/users.controller");
 const authMiddleware = require("./middlewares/auth");
-require("./api/articles/articles.schema"); 
+require("./api/articles/articles.schema"); // temporaire
 const app = express();
-
 const server = http.createServer(app);
 const io = new Server(server);
 
-io.on('Connexion', (socket) => {
-  console.log('Un utilisateur est connecté');
-  socket.on('my_event', (data) => {
+io.on("connection", (socket) => {
+  console.log("Un utilisateur est connecté");
+  socket.on("my_event", (data) => {
     console.log(data);
   });
-  io.emit('event_from_server', { test: 'foo' });
+  io.emit("event_from_server", { test: "foo" });
 });
 
 app.use((req, res, next) => {
@@ -30,9 +29,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", authMiddleware, userRouter);
-app.use("/api/aricles", articlesRouter)
+app.use("/api/articles", authMiddleware, articlesRouter)
 app.post("/login", usersController.login);
-
+app.post("/api/articles/user/:id", authMiddleware, async (req, res) => {
+});
 app.use("/", express.static("public"));
 
 app.use((req, res, next) => {

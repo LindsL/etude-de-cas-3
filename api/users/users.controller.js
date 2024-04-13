@@ -85,6 +85,7 @@ class UsersController {
       });
       res.json({
         token,
+        user,
       });
     } catch (err) {
       next(err);

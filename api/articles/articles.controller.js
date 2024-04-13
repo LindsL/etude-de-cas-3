@@ -17,7 +17,6 @@ class ArticlesController {
         }
     }
 
-
     async updateArticle(req, res) {
         try {
             const article = await this.articlesService.updateArticle(req.params.id, req.body, req.user);

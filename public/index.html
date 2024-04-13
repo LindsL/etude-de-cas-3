@@ -4,7 +4,7 @@
 <script src="https://unpkg.com/vue@3"></script>
 
 <body>
-    <main class="container" id="app">
+    <main class="container">
       <article class="grid" v-if="layout == 'login'">
         <div>
           <hgroup>
@@ -91,29 +91,3 @@ createApp({
         }).then(res => res.data)
         this.users = users
       }
-
-      socket.on('user:create', (data) => {
-        this.users.push(data)
-      })
-
-      socket.on('user:delete', (data) => {
-        this.users = this.users.filter(user => user._id != data.id)
-      })
-    },
-    async remove(userId) {
-      await axios.delete('/api/users/' + userId, {
-          headers: {
-            'x-access-token': this.userToken
-          }
-      })
-    },
-    async create() {
-      await axios.post('/api/users', this.newUser, {
-          headers: {
-            'x-access-token': this.userToken
-          }
-      }).then(res => res.data)
-    }
-  }
-}).mount('#app')
-</script>
